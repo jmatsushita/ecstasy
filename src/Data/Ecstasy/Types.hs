@@ -63,13 +63,13 @@ newtype SystemT w m a = SystemT
 
 instance MonadTrans (SystemT w) where
   lift = SystemT . lift
-  {-# INLINE lift #-}
+  {-# INLINE[2] lift #-}
 
 instance MonadState s m => MonadState s (SystemT w m) where
   get = SystemT . lift $ get
-  {-# INLINE get #-}
+  {-# INLINE[2] get #-}
   put = SystemT . lift . put
-  {-# INLINE put #-}
+  {-# INLINE[2] put #-}
 
 
 ------------------------------------------------------------------------------
@@ -94,13 +94,13 @@ newtype QueryT w m a = QueryT
 
 instance MonadTrans (QueryT w) where
   lift = QueryT . lift . lift
-  {-# INLINE lift #-}
+  {-# INLINE[2] lift #-}
 
 instance MonadReader r m => MonadReader r (QueryT w m) where
   ask = QueryT $ lift ask
-  {-# INLINE ask #-}
+  {-# INLINE[2] ask #-}
   local f = QueryT . runQueryT' . local f
-  {-# INLINE local #-}
+  {-# INLINE[2] local #-}
 
 
 ------------------------------------------------------------------------------
@@ -154,4 +154,3 @@ type family Component (s :: StorageType)
   Component ('WorldOf m)  'Field   a = IntMap a
   Component ('WorldOf m)  'Unique  a = Maybe (Int, a)
   Component ('WorldOf m)  'Virtual a = VTable m a
-

@@ -65,7 +65,7 @@ class HasWorld' world => HasWorld world m where
          . fmap to
          . gGetEntity @m (from w)
          $ T.unEnt e
-  {-# INLINE getEntity #-}
+  {-# INLINE[3] getEntity #-}
 
   ----------------------------------------------------------------------------
   -- | Updates an 'Ent' in the world given its setter.
@@ -91,7 +91,7 @@ class HasWorld' world => HasWorld world m where
               . gSetEntity (from s) (T.unEnt e)
               $ from w
     SystemT . modify . second $ const x
-  {-# INLINE setEntity #-}
+  {-# INLINE[3] setEntity #-}
 
   ----------------------------------------------------------------------------
   -- | The default world, which contains only empty containers.
@@ -102,7 +102,7 @@ class HasWorld' world => HasWorld world m where
          )
       => world ('WorldOf m)
   defStorage = def @'True
-  {-# INLINE defStorage #-}
+  {-# INLINE[3] defStorage #-}
 
 
 class HasWorld' world where
@@ -121,7 +121,7 @@ class HasWorld' world where
       => world 'FieldOf
       -> world 'SetterOf
   convertSetter = to . gConvertSetter . from
-  {-# INLINE convertSetter #-}
+  {-# INLINE[3] convertSetter #-}
 
   ----------------------------------------------------------------------------
   -- | The default entity, owning no components.
@@ -132,7 +132,7 @@ class HasWorld' world where
          )
       => world 'FieldOf
   newEntity = def @'True
-  {-# INLINE newEntity #-}
+  {-# INLINE[3] newEntity #-}
 
   ----------------------------------------------------------------------------
   -- | The default setter, which keeps all components with their previous value.
@@ -143,7 +143,7 @@ class HasWorld' world where
          )
       => world 'SetterOf
   unchanged = def @'True
-  {-# INLINE unchanged #-}
+  {-# INLINE[3] unchanged #-}
 
   ----------------------------------------------------------------------------
   -- | A setter which will delete the entity if its 'QueryT' matches.
@@ -154,7 +154,7 @@ class HasWorld' world where
          )
       => world 'SetterOf
   delEntity = def @'False
-  {-# INLINE delEntity #-}
+  {-# INLINE[3] delEntity #-}
 
 
 instance ( Generic (world 'SetterOf)
@@ -206,7 +206,7 @@ class StorageSurgeon t m world where
     => world ('WorldOf m)
     -> world ('WorldOf (t m))
   hoistStorage = to . gHoistWorld @t @m . from
-  {-# INLINE hoistStorage #-}
+  {-# INLINE[3] hoistStorage #-}
 
   ----------------------------------------------------------------------------
   -- | Grafts two worlds together, using data from the second argument and
@@ -225,7 +225,7 @@ class StorageSurgeon t m world where
     -> world ('WorldOf (t m))
     -> world ('WorldOf m)
   graftStorage a b = to $ gGraft (from a) (from b)
-  {-# INLINE graftStorage #-}
+  {-# INLINE[3] graftStorage #-}
 
 
 instance ( Generic (world ('WorldOf m))
@@ -305,7 +305,7 @@ unQueryT
   -> world 'FieldOf
   -> m (Maybe a)
 unQueryT q e f = runMaybeT $ flip runReaderT (e, f) $ runQueryT' q
-{-# INLINE unQueryT #-}
+{-# INLINE[2] unQueryT #-}
 
 
 ------------------------------------------------------------------------------
@@ -450,7 +450,7 @@ with
     => (world 'FieldOf -> Maybe a)
     -> QueryT world m ()
 with = void . query
-{-# INLINE with #-}
+{-# INLINE[2] with #-}
 
 
 ------------------------------------------------------------------------------
@@ -474,7 +474,7 @@ query
 query f = do
   e <- QueryT $ asks snd
   maybe mzero pure $ f e
-{-# INLINE query #-}
+{-# INLINE[2] query #-}
 
 
 ------------------------------------------------------------------------------
@@ -543,4 +543,3 @@ anEnt = pure . pure
 maybeToUpdate :: Maybe a -> Update a
 maybeToUpdate Nothing  = Unset
 maybeToUpdate (Just a) = Set a
-

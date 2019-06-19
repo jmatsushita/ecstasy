@@ -41,21 +41,21 @@ class GHoistWorld (t :: (* -> *) -> * -> *) (m :: * -> *) a b where
 instance {-# OVERLAPPING #-} (MonadTrans t, Functor (t m), Monad m)
     => GHoistWorld t m (K1 i (VTable m a)) (K1 i' (VTable (t m) a)) where
   gHoistWorld (K1 (VTable g s)) = K1 . VTable (fmap lift g) $ fmap (fmap lift) s
-  {-# INLINE gHoistWorld #-}
+  {-# INLINE[4] gHoistWorld #-}
 
 instance {-# OVERLAPPABLE #-} GHoistWorld t m (K1 i a) (K1 i' a) where
   gHoistWorld (K1 a) = K1 a
-  {-# INLINE gHoistWorld #-}
+  {-# INLINE[4] gHoistWorld #-}
 
 instance (Functor (t m), GHoistWorld t m f f')
     => GHoistWorld t m (M1 i c f) (M1 i' c' f') where
   gHoistWorld (M1 a) = M1 $ gHoistWorld @t @m a
-  {-# INLINE gHoistWorld #-}
+  {-# INLINE[4] gHoistWorld #-}
 
 instance (Applicative (t m), GHoistWorld t m a c, GHoistWorld t m b d)
     => GHoistWorld t m (a :*: b) (c :*: d) where
   gHoistWorld (a :*: b) = gHoistWorld @t @m a :*: gHoistWorld @t @m b
-  {-# INLINE gHoistWorld #-}
+  {-# INLINE[4] gHoistWorld #-}
 
 
 ------------------------------------------------------------------------------
@@ -66,19 +66,19 @@ class GGraft a b where
 instance {-# OVERLAPPING #-} GGraft (K1 i (VTable m a))
                                     (K1 i' (VTable (t m) a)) where
   gGraft a _ = a
-  {-# INLINE gGraft #-}
+  {-# INLINE[4] gGraft #-}
 
 instance GGraft (K1 i a) (K1 i' a) where
   gGraft _ (K1 a) = K1 a
-  {-# INLINE gGraft #-}
+  {-# INLINE[4] gGraft #-}
 
 instance (GGraft f f') => GGraft (M1 i c f) (M1 i' c' f') where
   gGraft (M1 a) (M1 e) = M1 $ gGraft a e
-  {-# INLINE gGraft #-}
+  {-# INLINE[4] gGraft #-}
 
 instance (GGraft a c, GGraft b d) => GGraft (a :*: b) (c :*: d) where
   gGraft (a :*: b) (c :*: d) = gGraft a c :*: gGraft b d
-  {-# INLINE gGraft #-}
+  {-# INLINE[4] gGraft #-}
 
 
 
@@ -89,26 +89,26 @@ class GConvertSetter a b where
 
 instance GConvertSetter (K1 i a) (K1 i' (Maybe a)) where
   gConvertSetter (K1 a) = K1 $ Just a
-  {-# INLINE gConvertSetter #-}
+  {-# INLINE[4] gConvertSetter #-}
 
 instance GConvertSetter (K1 i a) (K1 i' (Update a)) where
   gConvertSetter (K1 a) = K1 $ Set a
-  {-# INLINE gConvertSetter #-}
+  {-# INLINE[4] gConvertSetter #-}
 
 instance GConvertSetter (K1 i (Maybe a)) (K1 i' (Update a)) where
   gConvertSetter (K1 (Just a)) = K1 $ Set a
   gConvertSetter (K1 Nothing)  = K1 Unset
-  {-# INLINE gConvertSetter #-}
+  {-# INLINE[4] gConvertSetter #-}
 
 instance GConvertSetter f f'
     => GConvertSetter (M1 i c f) (M1 i' c' f') where
   gConvertSetter (M1 a) = M1 $ gConvertSetter a
-  {-# INLINE gConvertSetter #-}
+  {-# INLINE[4] gConvertSetter #-}
 
 instance (GConvertSetter a c, GConvertSetter b d)
     => GConvertSetter (a :*: b) (c :*: d) where
   gConvertSetter (a :*: b) = gConvertSetter a :*: gConvertSetter b
-  {-# INLINE gConvertSetter #-}
+  {-# INLINE[4] gConvertSetter #-}
 
 
 ------------------------------------------------------------------------------
@@ -119,28 +119,28 @@ class GGetEntity m a b where
 instance (Monad m)
     => GGetEntity m (K1 i (VTable m a)) (K1 i' (Maybe a)) where
   gGetEntity (K1 (VTable vg _)) e = lift . fmap K1 . vg $ Ent e
-  {-# INLINE gGetEntity #-}
+  {-# INLINE[4] gGetEntity #-}
 
 instance Applicative m
     => GGetEntity m (K1 i (IntMap a)) (K1 i' (Maybe a)) where
   gGetEntity (K1 a) e = pure . K1 $ I.lookup e a
-  {-# INLINE gGetEntity #-}
+  {-# INLINE[4] gGetEntity #-}
 
 instance Applicative m
     => GGetEntity m (K1 i (Maybe (Int, a))) (K1 i' (Maybe a)) where
   gGetEntity (K1 (Just (e', a))) e | e == e' = pure . K1 $ Just a
   gGetEntity _ _ = pure $ K1 Nothing
-  {-# INLINE gGetEntity #-}
+  {-# INLINE[4] gGetEntity #-}
 
 instance (Functor m, GGetEntity m f f')
     => GGetEntity m (M1 i c f) (M1 i' c' f') where
   gGetEntity (M1 a) e = fmap M1 $ gGetEntity a e
-  {-# INLINE gGetEntity #-}
+  {-# INLINE[4] gGetEntity #-}
 
 instance (Applicative m, GGetEntity m a c, GGetEntity m b d)
     => GGetEntity m (a :*: b) (c :*: d) where
   gGetEntity (a :*: b) e = (:*:) <$> gGetEntity a e <*> gGetEntity b e
-  {-# INLINE gGetEntity #-}
+  {-# INLINE[4] gGetEntity #-}
 
 
 ------------------------------------------------------------------------------
@@ -156,36 +156,36 @@ instance Applicative m
        then K1 Nothing
        else K1 $ Just (e', b)
   gSetEntity _  _ (K1 b) = pure $ K1 b
-  {-# INLINE gSetEntity #-}
+  {-# INLINE[4] gSetEntity #-}
 
 instance (Monad m)
     => GSetEntity m (K1 i' (Update a)) (K1 i' (VTable m a)) where
   gSetEntity (K1 a) e (K1 z@(VTable _ vs)) =
     lift (vs (Ent e) a) *> pure (K1 z)
-  {-# INLINE gSetEntity #-}
+  {-# INLINE[4] gSetEntity #-}
 
 instance Applicative m
     => GSetEntity m (K1 i (Update a)) (K1 i' (IntMap a)) where
   gSetEntity (K1 Keep) _ (K1 b)    = pure $ K1 b
   gSetEntity (K1 (Set a)) e (K1 b) = pure . K1 $ I.alter (const $ Just a) e b
   gSetEntity (K1 Unset) e (K1 b)   = pure . K1 $ I.alter (const Nothing) e b
-  {-# INLINE gSetEntity #-}
+  {-# INLINE[4] gSetEntity #-}
 
 instance (Functor m, GSetEntity m f f')
     => GSetEntity m (M1 i c f) (M1 i' c' f') where
   gSetEntity (M1 a) e (M1 b) = coerce $ gSetEntity @m a e b
-  {-# INLINE gSetEntity #-}
+  {-# INLINE[4] gSetEntity #-}
 
 instance (Applicative m, GSetEntity m a c, GSetEntity m b d)
     => GSetEntity m (a :*: b) (c :*: d) where
   gSetEntity (a :*: b) e (c :*: d) = (:*:) <$> gSetEntity a e c
                                            <*> gSetEntity b e d
-  {-# INLINE gSetEntity #-}
+  {-# INLINE[4] gSetEntity #-}
 
 
 def :: forall keep a. (Generic a, GDefault keep (Rep a)) => a
 def = to $ gdef @keep
-{-# INLINE def #-}
+{-# INLINE[4] def #-}
 
 
 ------------------------------------------------------------------------------
@@ -197,23 +197,23 @@ class GDefault (keep :: Bool) f where
 
 instance GDefault keep U1 where
   gdef = U1
-  {-# INLINE gdef #-}
+  {-# INLINE[4] gdef #-}
 
 instance GDefault keep (K1 i (Maybe c)) where
   gdef = K1 Nothing
-  {-# INLINE gdef #-}
+  {-# INLINE[4] gdef #-}
 
 instance GDefault 'False (K1 i (Update c)) where
   gdef = K1 Unset
-  {-# INLINE gdef #-}
+  {-# INLINE[4] gdef #-}
 
 instance GDefault 'True (K1 i (Update c)) where
   gdef = K1 Keep
-  {-# INLINE gdef #-}
+  {-# INLINE[4] gdef #-}
 
 instance GDefault keep (K1 i (IntMap c)) where
   gdef = K1 I.empty
-  {-# INLINE gdef #-}
+  {-# INLINE[4] gdef #-}
 
 instance {-# OVERLAPPING #-} (Applicative m, KnownSymbol sym)
     => GDefault keep (M1 S ('MetaSel ('Just sym) x y z)
@@ -226,16 +226,16 @@ instance {-# OVERLAPPING #-} (Applicative m, KnownSymbol sym)
             , symbolVal $ Proxy @sym
             , "'"
             ]
-  {-# INLINE gdef #-}
+  {-# INLINE[4] gdef #-}
 
 instance GDefault keep f => GDefault keep (M1 i c f) where
   gdef = M1 $ gdef @keep
-  {-# INLINE gdef #-}
+  {-# INLINE[4] gdef #-}
 
 instance (GDefault keep a, GDefault keep b)
     => GDefault keep (a :*: b) where
   gdef = gdef @keep :*: gdef @keep
-  {-# INLINE gdef #-}
+  {-# INLINE[4] gdef #-}
 
 
 ------------------------------------------------------------------------------
@@ -254,7 +254,7 @@ instance GCommand w (K1 _i (IntMap a))
   gCommand x f = (x+1,) . K1 . (,x) $ \w ->
     let v = unK1 $ f w
      in Just $ I.keysSet v
-  {-# INLINE gCommand #-}
+  {-# INLINE[4] gCommand #-}
 
 instance GCommand w (K1 _i (Maybe (Int, a)))
                     (K1 _i' (w -> Maybe IntSet, Int)) where
@@ -264,7 +264,7 @@ instance GCommand w (K1 _i (Maybe (Int, a)))
   gCommand x f = (x+1,) . K1 . (,x) $ \w ->
     let v = unK1 $ f w
      in Just $ maybe IS.empty (IS.singleton . fst) v
-  {-# INLINE gCommand #-}
+  {-# INLINE[4] gCommand #-}
 
 instance GCommand w (K1 _i (VTable m a))
                     (K1 _i' (w -> Maybe IntSet, Int)) where
@@ -272,12 +272,12 @@ instance GCommand w (K1 _i (VTable m a))
                (K1 _i (VTable m a))
                (K1 _i' (w -> Maybe IntSet, Int)) = '[a]
   gCommand x _ = (x+1, ) . K1 . (,x) $ const Nothing
-  {-# INLINE gCommand #-}
+  {-# INLINE[4] gCommand #-}
 
 instance GCommand w i o => GCommand w (M1 _i _c i) (M1 _i' _c' o) where
   type Commands w (M1 _i _c i) (M1 _i' _c' o) = Commands w i o
   gCommand x f = fmap M1 . gCommand x $ unM1 . f
-  {-# INLINE gCommand #-}
+  {-# INLINE[4] gCommand #-}
 
 instance (GCommand w i o, GCommand w i' o')
     => GCommand w (i :*: i') (o :*: o') where
@@ -286,7 +286,7 @@ instance (GCommand w i o, GCommand w i' o')
     let (x',  fc) = gCommand x  ((\(a :*: _) -> a) . f)
         (x'', gc) = gCommand x' ((\(_ :*: b) -> b) . f)
      in (x'', fc :*: gc)
-  {-# INLINE gCommand #-}
+  {-# INLINE[4] gCommand #-}
 
 
 command
@@ -300,7 +300,7 @@ command
        )
     => world ('FreeOf world m)
 command = to . snd $ gCommand @worldOf 0 from
-{-# INLINE command #-}
+{-# INLINE[4] command #-}
 
 
  -- world ('WorldOf m) -> Component ('FreeOf (world ('WorldOf m))) z a
@@ -348,7 +348,7 @@ newtype Zoom w m a = Zoom
 instance Functor (Zoom w f) where
   fmap f (Zoom (EmbedAt m (Heckin r s k))) =
     Zoom . EmbedAt m . Heckin r s $ f . k
-  {-# INLINE fmap #-}
+  {-# INLINE[4] fmap #-}
 
 data Heckin w m b a = Heckin
   { heckinRelevant :: w ('WorldOf m) -> Maybe IntSet
@@ -357,4 +357,3 @@ data Heckin w m b a = Heckin
   }
 
 -- -- zoo2 :: Codensity (Free (Flip (->)
-
