@@ -22,7 +22,7 @@ Benchmark ecstasy-bench: FINISH
 Completed 2 action(s).
 ```
 
-## After INLINE[phase] master_inlined branch
+## After INLINE[phase] [master_inlined](https://github.com/isovector/ecstasy/compare/master...jmatsushita:master_inlined) branch
 
 ```
 Benchmark ecstasy-bench: RUNNING...
@@ -65,7 +65,7 @@ Benchmark ecstasy-bench: FINISH
 Completed 2 action(s).
 ```
 
-## Before INLINE[phase] insanity2_inlined branch
+## Before INLINE[phase] [insanity2_inlined](https://github.com/isovector/ecstasy/compare/master...jmatsushita:insanity2_inlined) branch
 
 ```
 Benchmark ecstasy-bench: RUNNING...
