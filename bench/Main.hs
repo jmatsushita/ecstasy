@@ -81,9 +81,9 @@ runSize :: String -> Int -> Benchmark
 runSize name size =
   let initialized = initSize size in
   bgroup name
-    [  -- bench "init"         $ whnfIO $ runWorld initialized
+    [  bench "init"         $ whnfIO $ runWorld initialized
     -- , bench "dumb"         $ whnfIO $ runWorld $ initialized >> dumbMap
-      bench "smart"        $ whnfIO $ runWorld $ initialized >> smartMap
+    ,  bench "smart"        $ whnfIO $ runWorld $ initialized >> smartMap
     -- , bench "sparse_dumb"  $ whnfIO $ runWorld $ initialized >> sparseDumbMap
     -- , bench "sparse_smart" $ whnfIO $ runWorld $ initialized >> sparseSmartMap
     ]
