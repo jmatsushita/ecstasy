@@ -94,7 +94,7 @@ main = C.defaultMainWith C.defaultConfig
   [ -- runSize "micro"   1
   -- , runSize "tiny"    10
   -- , runSize "small"   100
-    runSize "big"     1000
-  -- , runSize "huge"    10000
+  --  runSize "big"     1000
+  runSize "huge"    10000
   -- , runSize "massive" 100000
   ]
